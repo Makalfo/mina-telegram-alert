@@ -1,0 +1,3 @@
+# ignore the config.ini and bigquery-api.json to avoid leakage
+config.ini
+bigquery-api.json
