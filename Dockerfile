@@ -11,4 +11,4 @@ WORKDIR /mina-telegram-alert/
 RUN pip3 install -r requirements.txt
 
 # run the script
-CMD python3 mina-telegram-alert.py > /output.log 2>&1
+CMD python3 mina-telegram-alert.py

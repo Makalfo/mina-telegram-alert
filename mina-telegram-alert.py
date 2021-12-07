@@ -33,7 +33,7 @@ class MinaTelegram():
             blocks = self.get_blocks( self.config['Mina']['last_block'] )
 
             # check if the block is empty
-            if not isinstance(blocks, pd.DataFrame) and blocks == None:
+            if blocks.empty:
                 print( f'Empty Blocks - Sleeping for {SLEEP_TIME}')
                 time.sleep( SLEEP_TIME )
                 continue
@@ -105,8 +105,9 @@ class MinaTelegram():
         iterator = query_job.result()
         rows = list(iterator)
 
+        # if the query returns no data, return empty dataframe
         if len( rows ) == 0:
-            return
+            return pd.DataFrame()
         # Transform the rows into a nice pandas dataframe
         df = pd.DataFrame(data=[list(x.values()) for x in rows], columns=list(rows[0].keys()))
         df.drop_duplicates(subset=['statehash'])
