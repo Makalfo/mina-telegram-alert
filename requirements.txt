@@ -2,3 +2,4 @@ requests
 configparser
 pandas
 base58
+google
