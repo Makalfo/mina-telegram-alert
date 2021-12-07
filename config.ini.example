@@ -1,0 +1,11 @@
+[BigQuery]
+credentials = "/bigquery-api.json"
+
+[Telegram]
+telegram_token = <telegram token>
+telegram_chat_id = <telegram chat id>
+
+[Mina]
+public_key = <public key>
+last_block = <last block>
+

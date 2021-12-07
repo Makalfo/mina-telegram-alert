@@ -30,8 +30,15 @@ class MinaTelegram():
         
         while True:
             # obtain blocks
-            blocks = self.get_blocks( self.config['Mina']['last_block'] )    
-            block_list = list( set( [int(i) for i in blocks['blockheight'].values[:]] ) )
+            blocks = self.get_blocks( self.config['Mina']['last_block'] )
+
+            # check if the block is empty
+            if not isinstance(blocks, pd.DataFrame) and blocks == None:
+                print( f'Empty Blocks - Sleeping for {SLEEP_TIME}')
+                time.sleep( SLEEP_TIME )
+                continue
+
+            block_list = blocks['blockheight'].unique()
             block_list.sort()
 
             # save the datetime
@@ -46,6 +53,7 @@ class MinaTelegram():
 
             # parse the blocks
             for blockheight in block_list:
+                print( f'Parsing blockheight: {blockheight}')
                 # obtain all the blocks of the block height
                 blocks_of_height = blocks.loc[blocks['blockheight'] == blockheight] 
                 self.parse_blocks( blocks_of_height )
@@ -55,6 +63,7 @@ class MinaTelegram():
             with open( config_file, 'w') as configfile:
                 self.config.write(configfile)
             
+            print( f'Sleeping for {SLEEP_TIME}')
             time.sleep( SLEEP_TIME )
         
     def read_config( self, config_file ):
@@ -77,6 +86,7 @@ class MinaTelegram():
         Send telegram message
         '''
         requests.post( f'https://api.telegram.org/bot{self.telegram_token}/sendMessage?chat_id={self.telegram_chat_id}&text={msg}' )
+        print( msg )
 
     def get_blocks( self, target_blockheight ):
         '''Get the blocks'''
@@ -95,6 +105,8 @@ class MinaTelegram():
         iterator = query_job.result()
         rows = list(iterator)
 
+        if len( rows ) == 0:
+            return
         # Transform the rows into a nice pandas dataframe
         df = pd.DataFrame(data=[list(x.values()) for x in rows], columns=list(rows[0].keys()))
         df.drop_duplicates(subset=['statehash'])
