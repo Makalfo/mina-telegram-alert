@@ -2,5 +2,5 @@ requests
 configparser
 pandas
 base58
-google
+google.cloud.bigquery
 google-cloud
