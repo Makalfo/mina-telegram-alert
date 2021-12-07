@@ -3,3 +3,4 @@ configparser
 pandas
 base58
 google
+google-cloud
