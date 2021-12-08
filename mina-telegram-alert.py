@@ -23,6 +23,10 @@ class MinaTelegram():
         self.public_key = self.config['Mina']['public_key']
         self.client = bigquery.Client()
         
+        # transaction
+        self.recieved = 0
+        self.sent = 0
+
         # set the bigquery variable
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = self.config['BigQuery']['credentials'] 
 
@@ -57,7 +61,7 @@ class MinaTelegram():
 
             # parse the blocks
             for blockheight in block_list:
-                print( f'Parsing blockheight: {blockheight}')
+                #print( f'Parsing blockheight: {blockheight}')
                 # obtain all the blocks of the block height
                 blocks_of_height = blocks.loc[blocks['blockheight'] == blockheight] 
                 self.parse_blocks( blocks_of_height )
@@ -121,6 +125,7 @@ class MinaTelegram():
     def get_providers( self ):
         '''get provider list'''
         output = dict()
+        
         # staketab providers
         with urllib.request.urlopen(self.config['Providers']['staketab']) as url:
             data = json.loads(url.read().decode())
@@ -137,6 +142,10 @@ class MinaTelegram():
         for idx, address in enumerate(mf_data):
             output[ address ] = f'O1 Labs {idx}'
 
+        # unofficial accounts
+        unofficial = pd.read_csv( self.config['Providers']['unofficial'] )
+        for idx, row in unofficial.iterrows():
+            output[ row['address'] ] = row['identity']
         return output
 
     def get_csv( self, url ):
@@ -180,6 +189,14 @@ class MinaTelegram():
                         self.send( f"{canonical} {block.blockheight}: Stake Delegation from {self.get_provider( transaction['from'] )} to {self.get_provider( transaction['to'])} [{transaction['memo'].strip()}] at { block.date } { block.time }" )
                     else:
                         self.send( f"{canonical} {block.blockheight}: {transaction['kind'].capitalize()} from {self.get_provider( transaction['from'] )} to {self.get_provider( transaction['to'])} for {transaction['amount']} [{transaction['memo'].strip()}] at { block.date } { block.time }" )
+                        if transaction['kind'] == 'PAYMENT':
+                            if transaction['from'] == self.public_key:
+                                self.sent += transaction['amount']
+                            else:
+                                self.recieved += transaction['amount']
+                    # Send how much has gone through the account so far
+                    self.send( f'Sent: {self.sent}\tReceived: {self.recieved}')
+
 
 
     def parse_transactions( self, transactions ):
