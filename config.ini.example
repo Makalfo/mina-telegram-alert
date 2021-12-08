@@ -9,3 +9,7 @@ telegram_chat_id = <telegram chat id>
 public_key = <public key>
 last_block = <last block>
 
+[Providers]
+staketab = https://api.staketab.com/mina/get_all_providers
+mina_foundation = https://docs.minaprotocol.com/static/Mina_Foundation_Addresses.csv
+o1_labs = https://docs.minaprotocol.com/static/O1_Labs_addresses.csv
