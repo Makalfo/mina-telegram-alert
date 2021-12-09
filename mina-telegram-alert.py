@@ -195,7 +195,7 @@ class MinaTelegram():
                             else:
                                 self.recieved += transaction['amount']
                     # Send how much has gone through the account so far
-                    self.send( f'Sent: {self.sent}\tReceived: {self.recieved}')
+                    # self.send( f'Sent: {self.sent}\tReceived: {self.recieved}')
 
 
 
